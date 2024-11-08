@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          Confirm Product Deletion
+        </div>
+        <div class="card-body">
+          <p>Are you sure you want to delete the product "<span style="font-weight: 600;font-size:19px">{{ product.name }}</span>"?</p>
+          <p>This action cannot be undone.</p>
+          <form action="#" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a href="{% url 'update_products' %}" class="btn btn-dark">Cancel</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+{% endblock content %}

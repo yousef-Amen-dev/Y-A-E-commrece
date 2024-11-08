@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Un-Shipped Orders Dashboard</h1>
+        <table class="table table-light table-striped table-hover" style="max-width: 1500px;">
+          <thead class="table-dark">
+            <tr>
+              <th scope="col">Order</th>
+              <th scope="col">Customer Name</th>
+              <th scope="col">Customer Email</th>
+              <th scope="col">Date Shipped</th>
+              <th scope="col">Country</th>
+              <th scope="col">Total</th>
+              <th scope="col">Status</th>
+              <th scope="col">Order Details</th>
+            </tr>
+          </thead>
+          {% for order in unshipped_orders %}
+          
+          <tbody>
+            <tr>
+              <td>{{order.id}}</td>
+              <td>{{ order.user.username }}</td>
+              <td>{{ order.email}}</td>
+              <td>{{ order.order_time|date:'d-M-Y, h:m:s'}}</td>
+              <td>{{ order.shipping_address.shipping_country}}</td>
+              <td>${{ order.amount}}</td>
+              <td>Un-Shipped</td>
+              <td><a href="{% url 'user_order_detail' order.order_uuid %}" class="btn btn-primary">Viwes Details</a></td>
+            </tr>
+          </tbody>
+          {% endfor %}
+        </table>
+      </div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+{% endblock content %}

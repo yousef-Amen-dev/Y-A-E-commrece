@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static%}
+{% block content %}
+<body>
+  <header class="bg-dark py-5">
+    <div class="container px-4 px-lg-5 my-5">
+      <div class="text-center text-white">
+        <h1 class="display-4 fw-bolder">YA-Ecommers</h1>
+        <p class="lead fw-normal text-white-50 mb-0">The reliable online store where you can find everything you need.</p>
+      </div>
+    </div>
+  </header>
+
+  <section class="py-5">
+    <div class="container px-4 px-lg-5">
+      <div class="row mb-5">
+        <div class="col-md-6">
+          <img src="{% static 'images/about_us_image_ecom_two.jpg' %}" alt="YA-Ecommers Team" class="img-fluid rounded">
+        </div>
+        <div class="col-md-6">
+          <h2>Who We Are</h2>
+          <p>YA-Ecommers is a passionate team dedicated to providing a convenient and reliable online shopping experience. We started with a vision to make high-quality products accessible to everyone. We believe in offering a diverse selection of products at competitive prices, along with exceptional customer service.</p>
+        </div>
+      </div>
+
+      <div class="row mb-5">
+        <div class="col-md-6 order-md-2">
+          <h2>Our Mission</h2>
+          <p>Our mission is to empower customers to shop with confidence. We strive to create a user-friendly platform that simplifies the online shopping journey. We are committed to providing accurate product information, fast delivery, and a hassle-free return policy.</p>
+        </div>
+        <div class="col-md-6 order-md-1">
+          <img src="{% static 'images/about_us_ecom.jpg' %}" alt="YA-Ecommers Mission" class="img-fluid rounded">
+        </div>
+      </div>
+
+      <h2>Our Values</h2>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">Customer Focus</h5>
+              <p class="card-text">We prioritize customer satisfaction and go the extra mile to ensure a positive shopping experience.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">Quality Products</h5>
+              <p class="card-text">We source and curate high-quality products that meet our customers' expectations.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">Competitive Prices</h5>
+              <p class="card-text">We offer competitive prices to make our products accessible to a wide range of customers.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+  </section>
+</body>
+{% endblock content %}

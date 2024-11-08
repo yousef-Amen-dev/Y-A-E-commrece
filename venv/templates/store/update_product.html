@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<header class="bg-dark py-5">
+  <div class="container px-4 px-lg-5 my-5">
+    <div class="text-center text-white">
+      <h1 class="display-4 fw-bolder">Update Products Page</h1>
+      <p class="lead fw-normal text-white-80 mb-0">YA-Ecommers The Best Online Ecommers in The World.</p>
+    </div>
+  </div>
+</header>
+<form method="POST" class="mb-center" style="margin: 50px;" enctype="multipart/form-data">
+  {%csrf_token%}
+  {{forms.as_p}}
+  <button type="submit" class="btn btn-dark">Update</button>
+</form>
+{% endblock content %}

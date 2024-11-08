@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .product-link {
+        color: #333;
+        text-decoration: none;
+    }
+
+    .product-link:hover {
+        color: #6c757d;
+        text-decoration: underline;
+    }
+
+    .card:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        transform: scale(1.02);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-img-top {
+        transition: transform 0.3s ease;
+        height: 250px;
+        object-fit: cover;
+    }
+
+    .badge-fav {
+        font-size: 0.8rem;
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 0.5em 0.8em;
+    }
+
+    .product-title {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.2;
+        /* Limit the product name to two lines */
+        max-height: 2.4em;
+
+        /* Only apply line clamp if the browser supports it */
+        @supports (-webkit-line-clamp: 2) {
+            -webkit-line-clamp: 2;
+        }
+    }
+
+    .btn-outline-danger:hover {
+        background-color: #ff4d4d;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        color: white;
+    }
+
+    .card-footer .btn {
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .empty-fav-message {
+        background-color: #f8f9fa;
+        padding: 2em;
+        border-radius: 0.5em;
+    }
+</style>
+
+<div class="container my-5">
+  <h2 class="section-title text-center mb-5">Most Popular Products 🔥
+</h2>
+    {% if products %}
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+            {% for product in products %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <!-- Product Image with badge -->
+                        <div class="position-relative">
+                            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                            <span class="badge bg-success badge-fav">FAVOURITE</span>
+                        </div>
+
+                        <!-- Product Details -->
+                        <div class="card-body text-center">
+                            <a href="{% url 'product_details' product.slug %}" class="product-link">
+                                <h5 class="card-title product-title">{{ product.name }}</h5>
+                            </a>
+                            <p class="card-text mb-2">
+                                <strong>${{ product.price }}</strong>
+                            </p>
+                        </div>
+
+                        <!-- Footer with interactive buttons -->
+                        <div class="card-footer d-flex justify-content-between bg-white">
+                            <!-- View Product Details -->
+                            <a href="{% url 'product_details' product.slug %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-info-circle"></i> View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center empty-fav-message" role="alert">
+            <i class="fas fa-info-circle fa-lg"></i> You have no favourite products yet. Start adding your favourites now!
+        </div>
+    {% endif %}
+</div>
+{% endblock content %}
+
+
+

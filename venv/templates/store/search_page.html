@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+
+  .product-name {
+      font-weight: bold;
+      font-size: 16px; 
+      line-height: 1.5;
+      margin-bottom: 5px; 
+  }
+  
+  .name-link {
+      color: #0f1111; 
+      text-decoration: none;
+      display: -webkit-box;
+      -webkit-line-clamp: 4; 
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis; 
+  }
+  
+  .name-link:hover {
+      color: #6c757d;
+      text-decoration: underline; 
+  }
+  
+</style>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">{{category}}</h2>
+    <div class="row">
+        {% for product in products %}
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 250px; object-fit: cover;">
+                    <div class="card-body">
+                      <div class="product-name">
+                        <a href="{% url 'product_details' product.slug %}" class="name-link">
+                            <h5>{{ product.name|title }}</h5>
+                        </a>
+                    </div>
+                        <p class="card-text">
+                            <strong>Price:</strong> ${{ product.price }}<br>
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'product_details' product.slug %}" class="btn btn-outline-dark">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock content %}

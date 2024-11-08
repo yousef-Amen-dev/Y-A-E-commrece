@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load static %}
+{% block content %}
+
+<!-- Custom CSS Styling for Cards and Product Details -->
+<style>
+    /* Product Title with Webkit for line-clamping */
+    .product-name {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.2;
+        /* Limit the product name to two lines */
+        max-height: 2.4em;
+
+        /* Only apply line clamp if the browser supports it */
+        @supports (-webkit-line-clamp: 2) {
+            -webkit-line-clamp: 2;
+        }
+    }
+
+
+    .name-link {
+        color: #0f1111;
+        text-decoration: none;
+        display: inline-block;
+        width: 100%;  /* Ensure the ellipsis works properly */
+    }
+
+    .name-link:hover {
+        color: #6c757d;
+        text-decoration: underline;
+    }
+
+    /* Card Image Hover Effect */
+    .card:hover .card-img-top {
+        transform: scale(1.05);
+        transition: transform 0.3s ease;
+    }
+
+    /* Card Hover Effect */
+    .card:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        transform: translateY(-5px);
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+    .card-img-top {
+        height: 250px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .card-body {
+        padding: 15px;
+    }
+
+    /* Price Styles */
+    .price {
+        font-size: 18px;
+        font-weight: 700;
+        color: #000;
+    }
+
+    .discounted-price {
+        font-size: 16px;
+        color: #6c757d;
+        text-decoration: line-through;
+    }
+
+    .badge-sale {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background-color: #dc3545;
+        color: white;
+        font-size: 14px;
+        padding: 5px 10px;
+    }
+
+    /* Love Icon for Favorites */
+    .love-icon {
+        font-size: 24px;
+        cursor: pointer;
+        color: #6c757d;
+    }
+
+    .love-icon.active {
+        color: red;
+    }
+
+    /* Card Footer Styling */
+    .card-footer {
+        background-color: white;
+        border-top: 0;
+    }
+</style>
+
+<!-- Flash Messages -->
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }}" role="alert">
+    {{ message }}
+</div>
+{% endfor %}
+
+<!-- Header with Background Image -->
+<header class="bg-dark py-5" style="background-image: url('{% static 'images/background-image-home.jpg' %}'); background-size: cover; background-position: center;">
+    <div class="container text-center text-white">
+        <h1 class="display-4 fw-bolder">Shopping in Online</h1>
+        <p class="lead fw-normal text-white-80 mb-0">YA-Ecommerce: The Best Online E-Commerce in the World.</p>
+    </div>
+</header>
+
+<!-- Product Section -->
+<section class="py-5">
+    {% for category in categories %}
+        {% if category.product_set.all %}
+            <div class="container mt-5">
+                <h2 class="text-center mb-4">Most Customers Viewed These Products</h2>
+                <hr class="mb-4" style="border: 0.5px solid #ccc;">
+                <div class="row">
+                    {% for product in products %}
+                        {% if category == product.category %}
+                            <div class="col-md-4">
+                                <div class="card mb-4 shadow-sm">
+                                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                                    <div class="card-body">
+                                        <div class="product-name">
+                                            <a href="{% url 'product_details' product.slug %}" class="name-link">
+                                                <h5>{{ product.name|title }}</h5>
+                                            </a>
+                                        </div>
+                                        <p class="card-text">
+                                            <strong>Price:</strong>
+                                            {% if product.discount %}
+                                                <span class="discounted-price">${{ product.discount|floatformat:2|intcomma }}</span>
+                                                ${{ product.price|floatformat:2|intcomma }}
+                                            {% else %}
+                                                ${{ product.price|floatformat:2|intcomma }}
+                                            {% endif %}
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>In Stock:</strong>
+                                            <span>{{product.instock}}</span></p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <a href="{% url 'product_details' product.slug %}" class="btn btn-outline-dark">View Details</a>
+                                            <form action="" method="POST">
+                                                {% csrf_token %}
+                                                <button disabled class="btn p-0 border-0" value="{{product.id}}" id="add-fav">
+                                                    <i class="{% if user in product.favourites.all %}fas{% else %}far{% endif %} fa-heart love-icon {% if user in product.favourites.all %}active{% endif %}" 
+                                                       id="heart-icon-{{ product.id }}">
+                                                    </i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+</section>
+
+{% endblock content %}

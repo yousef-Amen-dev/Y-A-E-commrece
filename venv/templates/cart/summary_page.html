@@ -1,0 +1,315 @@
+{%extends 'base.html'%}
+{% block content %}
+<!-- chack if the user have a products in the cart -->
+
+<!-- ------Separator for code reading--------- -->
+
+<style>
+  .related-products-link {
+    text-decoration: none;
+    color: #212529;
+    transition: color 0.3s ease;
+  }
+
+  .related-products-link:hover {
+    color: #4b4f56;
+  }
+
+  .product-card {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  }
+
+  .product-card:hover {
+    transform: translateY(-10px);
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .anthor_image {
+    overflow: hidden; /* Ensures the image doesn't overflow outside its container */
+    border: 2px solid transparent; /* Initial border (transparent) */
+    border-radius: 5px; /* Slight rounding of the corners */
+    transition: border 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for the hover effects */
+}
+
+/* Hover effect for the container */
+.anthor_image:hover {
+    border-color: #abc1d9; /* Change border color on hover */
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); /* Add a subtle shadow for depth */
+}
+/* Base style for the images */
+.anthor-image-img {
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for the hover effects */
+}
+
+/* Hover effect */
+.anthor-image-img:hover {
+    transform: scale(1.1); /* Slightly enlarge the image */
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); /* Add a subtle shadow to give depth */
+}
+
+  .quantity-label {
+    font-weight: 500;
+    padding-left: 1rem;
+  }
+
+.product-name {
+  font-weight: bold;
+  font-size: 16px; 
+  line-height: 1.5;
+  margin-bottom: 5px; 
+}
+.name-link {
+color: #0f1111; 
+text-decoration: none;
+display: -webkit-box;
+-webkit-line-clamp: 4; 
+-webkit-box-orient: vertical;
+overflow: hidden;
+text-overflow: ellipsis; 
+}
+
+.name-link:hover {
+color: #6c757d;
+text-decoration: underline; 
+}
+
+</style>
+{% if cart_products %}
+<!-- for loop to get the cart products -->
+{% for product in cart_products %}
+<div class="container pt-5 p-5">
+  
+  <div class="card mb-6" style="max-width: 800px;">
+    <div class="row g-0">
+      <div class="col-md-4 d-flex flex-column">
+        <img src="{{ product.image.url }}" class="rounded-start img-fluid img-cover" style="height: 100%;" alt="...">
+      </div>
+      <div class="col-md-8">
+        <div class="card-body">
+          <h5 class="card-title">{{product.name}}</h5>
+          <p class="card-text"> {{product.description}} This is a wider card with supporting text below as a natural
+            lead-in to additional content. This content is a little bit longer.</p>
+          <p class="card-text">Added: {{product.added}}<br><small class="text-muted">Last updated 3 mins ago</small></p>
+          {% if product.discount%}
+          <span class="card-text">Category: {{product.category}}</span>
+          <br>
+          <span class="card-text">Price:</span>
+          <span class="card-text">${{product.price}}</span>
+          <span class="card-text text-muted text-decoration-line-through">${{product.discount}}</span>
+          {%else%}
+          <span class="card-text">Category: {{product.category}}</span>
+          <br>
+          <span class="card-text">Price:</span>
+          <span class="card-text">${{product.price}}</span>
+
+          {%endif%}
+          <div class="d-flex small text-warning mb-2">
+            <div class="bi-star-fill"></div>
+            <div class="bi-star-fill"></div>
+            <div class="bi-star-fill"></div>
+            <div class="bi-star-fill"></div>
+          </div>
+        </div>
+        <span class="ps-3">Quantity</span>
+        <div class="row ps-3 pt-1">
+          <div class="col-md-2">
+            <select class="form-select" id="select{{product.id}}">
+              {% for key,value in product_quantitys.items %}
+              {% if key == product.id|slugify %}
+              <option selected>{{value}}</option>
+              {%endif%}
+              {%endfor%}
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="3">4</option>
+              <option value="3">5</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-footer p-4 pt-5 border-top-0 bg-transparent d-flex justify-content-center">
+          <a class="btn btn-outline-dark mt-auto flex-grow-1" href="{% url 'chackout_shipping_address'  %}">Buy Now</a>
+
+          <button type="button" data-index="{{product.id}}" class="btn btn-danger t btn-sm ms-3 delete-cart-product">
+            Remove
+          </button>
+
+          <button type="button" data-index="{{product.id}}" class="btn btn-primary t btn-sm ms-3 update-cart">
+            update Quantity
+          </button>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- end for -->
+{%endfor%}
+<!-- the total price -->
+<!-- clear cart button  -->
+<div class="card mb-2 p-3 shadow-sm border-0 rounded">
+  <!-- Total Price Section -->
+  <div class="card-body text-center border-bottom pb-3">
+    <h5 class="card-title fw-bold mb-1">Total Price</h5>
+    <p class="card-text display-8 text-primary">${{ total }}</p>
+  </div>
+
+  <!-- Checkout Button Section -->
+  <div class="d-flex justify-content-center py-3">
+    <a href="{% url 'chackout' %}" class="w-75">
+      <button type="button" class="btn btn-outline-secondary btn-sm w-100 fw-bold py-2">
+        Proceed to Checkout
+      </button>
+    </a>
+  </div>
+
+  <!-- Clear Cart Button Section -->
+  <div class="card-footer d-flex justify-content-end border-top pt-3">
+    <form action="{% url 'clear_cart' %}" method="POST">
+      {% csrf_token %}
+      <button class="btn btn-outline-danger btn-sm d-flex align-items-center gap-2">
+        <i class="bi bi-trash"></i> Clear Cart
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- ------Separator for code reading--------- -->
+
+<!-- else of the if cart_products -->
+{%else%}
+
+<!-- start container to of all products -->
+{% if profile %}
+<header class="bg-dark py-5">
+  <div class="container px-4 px-lg-5 my-5">
+    <div class="text-center text-white">
+      <h1 class="display-4 fw-bolder">your cart is empty {{profile.first_name}}?</h1>
+      <p class="lead fw-normal text-white-80 mb-0">sorry, you don't have any products in your cart
+        {{profile.first_name}}!</p>
+      <p class="lead fw-normal text-white-80 mb-0">try to add products in your cart!</p>
+    </div>
+  </div>
+</header>
+{%else%}
+<header class="bg-dark py-5">
+  <div class="container px-4 px-lg-5 my-5">
+    <div class="text-center text-white">
+      <h1 class="display-4 fw-bolder">your cart is empty ?</h1>
+      <p class="lead fw-normal text-white-80 mb-0">sorry, you don't have any products in your cart </p>
+      <p class="lead fw-normal text-white-80 mb-0">try to add products in your cart!</p>
+    </div>
+  </div>
+</header>
+{%endif%}
+<h2 class="text-center pt-5 pb-5">This The Most Popular Products</h2>
+{% for category in categories %}
+{% if category.product_set.all %}
+<h3 class="text-center text">{{ category }}</h3>
+<hr style="border:0.70px rgb(111, 110, 110) solid; width:100%;  ">
+
+<div class="row pt-3 ">
+  
+  {% for product in products %}
+  {% if category == product.category %}
+  <div class="col-md-4 mb-3 product-card">
+    <a class="related-products-link fw-bolder text-decoration-none product-name" href="{% url 'product_details' product.slug %}">
+      <div class="card">
+        <img src="{{ product.image.url }}" class="card-img-top img-cover" alt="...">
+        <div class="card-body product_name">
+          {% if product.name%}
+          <h5 class="card-text name-link">{{product.name}}</h5>
+          {%else%}
+          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
+            content.</p>
+          {%endif%}
+        </div>
+      </div>
+    </a>
+  </div>
+  {%endif%}
+  {% endfor %}
+  
+
+</div>
+{% endif %}
+{% endfor %}
+
+<!-- end container-->
+
+<!-- end if -->
+{%endif%}
+<script>
+  // Update Cart
+  $(document).on('click', '.update-cart', function (e) {
+    e.preventDefault();
+    // grab the product id
+    var productid = $(this).data('index');
+
+    $.ajax({
+      type: 'POST',
+      url: "{% url 'update_cart' %}",
+      data: {
+        product_id: $(this).data('index'),
+        product_qty: $('#select' + productid + ' option:selected').text(),
+        csrfmiddlewaretoken: '{{ csrf_token }}',
+        action: 'post'
+      },
+      success: function (json) {
+        //console.log(json)
+        //document.getElementById("cart_quantity").textContent = json.qty
+        location.reload();
+      },
+
+      error: function (xhr, errmsg, err) {
+
+      }
+
+
+    });
+
+  })
+  // delete products from cart
+  $(document).on('click', '.delete-cart-product', function (e) {
+    e.preventDefault();
+    // grab the product id
+    //var productid = $(this).data('index');
+
+    $.ajax({
+      type: 'POST',
+      url: "{% url 'delete_cart' %}",
+      data: {
+        product_id: $(this).data('index'),
+        csrfmiddlewaretoken: '{{ csrf_token }}',
+        action: 'post'
+      },
+      success: function (json) {
+        //console.log(json)
+        //document.getElementById("cart_quantity").textContent = json.qty
+        location.reload();
+      },
+
+      error: function (xhr, errmsg, err) {
+
+      }
+
+
+    });
+
+  })
+
+</script>
+<!-- yousef.code -->
+
+{% endblock content %}

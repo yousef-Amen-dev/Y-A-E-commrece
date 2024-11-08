@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h3>Are You Sure You Want Remove This Address</h3>
+  <span><small>You Cant Return him Agine And All Orders Realated For This Address Well Be Removed</small></span>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Full Name</th>
+        <th>Address Line 1</th>
+        <th>Address Line 2</th>
+        <th>City</th>
+        <th>State/Province</th>
+        <th>Postal Code</th>
+        <th>Country</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{ address.shipping_full_name }}</td>
+        <td>{{ address.shipping_adderss1 }}</td>
+        <td>{{ address.shipping_adderss2 }}</td>
+        <td>{{ address.shipping_city }}</td>
+        <td>{{ address.shipping_state }}</td>
+        <td>{{ address.shipping_zipcode }}</td>
+        <td>{{ address.shipping_countery }}</td>
+        <td>
+          <form action="" method ='POST'>
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger t btn-sm ms-3">Remove</button>
+          </form>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+</div>
+{% endblock content %}

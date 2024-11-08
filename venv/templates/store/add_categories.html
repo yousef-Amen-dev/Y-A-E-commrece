@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }}" role="alert">
+  {{ message }}
+</div>
+{%endfor%}
+<!-- Header with Background Image -->
+<header class="bg-dark py-5" >
+    
+  <div class="container text-center text-white">
+      <h1 class="display-4 fw-bolder">Shopping in Online</h1>
+      <p class="lead fw-normal text-white-80 mb-0">YA-Ecommers: The Best Online E-Commerce in the World.</p>
+  </div>
+</header>
+
+{% if user.is_superuser %}
+<form method="POST" class="mb-center" style="margin: 50px;">
+  {%csrf_token%}
+  {{forms.as_p}}
+  <button type="submit" class="btn btn-dark">Submit</button>
+</form>
+{% else %}
+<h1>Only Admins Can Adedd Products</h1>
+{% endif %}
+<br>
+<br>
+<br>
+<br>
+<br>
+{% endblock content %}

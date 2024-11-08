@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+
+<div class="container mt-5 mb-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header text-center bg-dark text-white py-4">
+          {% if profile.profile_image %}
+          <img src="{{ profile.profile_image.url }}" alt="Profile Image" class="img-fluid rounded-circle shadow-sm mb-3" width="150">
+          {% else %}
+          <img src="{% static 'images/default_website_images/default-image-writer.png' %}" alt="Profile Image" class="img-fluid rounded-circle shadow-sm mb-3" width="150">
+          {% endif %}
+
+          <h3 class="mt-3 mb-1">{{ profile.first_name }}{% if profile.last_name %} {{ profile.last_name }}{% endif %}</h3>
+          <p class="mb-0 small text-muted">{{ user.username }}</p>
+        </div>
+
+        <div class="card-body">
+          <p class="card-text"><strong>Email:</strong> {{ profile.email }}</p>
+          <p class="card-text"><strong>Gender:</strong> {{ profile.gender }}</p>
+
+          {% if profile.phone %}
+          <p class="card-text"><strong>Phone:</strong> {{ profile.phone }}</p>
+          {% endif %}
+          
+          {% if profile.address1 %}
+          <p class="card-text"><strong>Address 1:</strong> {{ profile.address1 }}</p>
+          {% endif %}
+          
+          {% if profile.address2 %}
+          <p class="card-text"><strong>Address 2:</strong> {{ profile.address2 }}</p>
+          {% endif %}
+
+          <p class="card-text"><strong>Country:</strong> {{ profile.country }}</p>
+          <p class="card-text small text-muted">Joined Date: {{ user.profile.joined_at|date:'d-m-Y H:i:s a' }}</p>
+        </div>
+
+        <div class="card-footer text-end">
+          <a href="{% url 'update_profile' %}" class="btn btn-outline-primary btn-sm me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Update Profile">
+            <i class="fas fa-edit"></i> Update
+          </a>
+
+          {% if user.is_authenticated %}
+          <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Logout">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </a>
+          {% endif %}
+          
+          <a href="{% url 'user_favourites_products_page' %}" class="btn btn-outline-dark btn-sm me-2">
+            <i class="fas fa-heart me-1"></i> Favourites
+          </a>
+          
+          <a href="{% url 'user_shipping_addresses' %}" class="btn btn-outline-dark btn-sm me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Shipping Information">
+            <i class="fas fa-shipping-fast"></i> Shipping Info
+          </a>
+
+          <a href="{% url 'user_orders' %}" class="btn btn-outline-dark btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Your Orders">
+            <i class="fas fa-shopping-cart"></i> Orders
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

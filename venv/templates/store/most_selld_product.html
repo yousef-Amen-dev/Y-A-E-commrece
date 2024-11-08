@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+
+  .product-name {
+      font-weight: bold;
+      font-size: 16px; 
+      line-height: 1.5;
+      margin-bottom: 5px; 
+  }
+  
+  .name-link {
+      color: #0f1111; 
+      text-decoration: none;
+      display: -webkit-box;
+      -webkit-line-clamp: 4; 
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis; 
+  }
+  
+  .name-link:hover {
+      color: #6c757d;
+      text-decoration: underline; 
+  }
+  
+</style>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Top Sold Products 🔥</h2>
+    <div class="row">
+        {% for product in products %}
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 250px; object-fit: cover;">
+                    <div class="card-body">
+                      <div class="product-name">
+                        <a href="{% url 'product_details' product.slug %}" class="name-link">
+                            <h5>{{ product.name|title }}</h5>
+                        </a>
+                    </div>
+                        <p class="card-text">
+                            <strong>Price:</strong> ${{ product.price }}<br>
+                            <strong>Total Sold:</strong> {{ product.total_quantity }} units
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'product_details' product.slug %}" class="btn btn-outline-dark">View Details</a>
+                            <form action="" method="POST">
+                                {% csrf_token %}
+                                <button class="btn p-0 border-0" value="{{product.id}}" id="add-fav">
+                                <i class="{% if user in product.favourites.all %}fas{% else %}far{% endif %} fa-heart" 
+                                id="heart-icon-{{ product.id }}" 
+                                style="font-size: 24px; color: {% if user in product.favourites.all %}red{% else %}gray{% endif %};"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    
+$(document).on('click', '#add-fav', function (e) {
+    e.preventDefault();
+    
+    $.ajax({
+      type: 'POST',
+      url: "{% url 'add_favourites_products' %}",
+      data: {
+        product_id: $('#add-fav').val(),
+        csrfmiddlewaretoken: '{{csrf_token}}',
+        action: 'post'
+      },
+      success: function (json) {
+        var icon = $('#heart-icon-' + $('#add-fav').val());
+        if (json.action === 'added') {
+            icon.removeClass('far').addClass('fas').css('color', 'red');
+            showMessage('Product added to favourites successfully!', 'success');
+        } else if (json.action === 'removed') {
+            icon.removeClass('fas').addClass('far').css('color', 'gray');
+            showMessage('Product removed from favourites.', 'info');
+        }
+    },
+      error: function (xhr, errmsg, err) {
+        console.error(`Error: ${errmsg}`);
+      }
+    });
+  })
+  function showMessage(message, type) {
+    // Remove any existing alert message
+    $('.alert').remove();
+    
+    // Create the alert div dynamically
+    var alertHtml = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>`;
+    
+    // Append the alert to a specific part of your page, e.g., a container for messages
+    $('#message-container').append(alertHtml);
+    
+    // Optionally, you can set the message to disappear after a few seconds
+    setTimeout(function () {
+        $('.alert').alert('close');
+    }, 3000);
+  }
+
+</script>
+
+{% endblock content %}

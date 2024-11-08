@@ -1,0 +1,95 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% load humanize %} 
+{% block content %}
+<style>
+    .product-name {
+        font-weight: bold;
+        font-size: 16px;
+        line-height: 1.5;
+        margin-bottom: 5px;
+    }
+
+    .name-link {
+        color: #0f1111;
+        text-decoration: none;
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .name-link:hover {
+        color: #6c757d;
+        text-decoration: underline;
+    }
+</style>
+
+<header class="bg-dark py-5">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="text-center text-white">
+            <h1 class="display-4 fw-bolder">
+                Shopping in Online
+            </h1>
+            <p class="lead fw-normal text-white-80 mb-0">
+                YA-Ecommers The Best
+                Online Ecommers in The
+                World.
+            </p>
+        </div>
+    </div>
+</header>
+<section class="py-5">
+    <div class="container px-4 px-lg-5 mt-5">
+        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+            {% for product in products %} 
+            {% if product %}
+            <div class="col mb-5">
+                <div class="card h-8">
+                    {% if product.image %}
+                    <img class="card-img-top" src="{{ product.image.url }}" alt="..." />
+                    {% else %}
+                    <img class="card-img-top" src="https://dummyimage.com/450x300/dee2e6/6c757d.jpg" alt="..." />
+                    {% endif %}
+                    <div class="card-body p-4">
+                        <div class="text-center">
+                            <div class="product-name">
+                                <a href="{% url 'product_details' product.id %}" class="name-link">
+                                    {{ product.name|title }}
+                                </a>
+                            </div>
+
+                            {% if product.discount %}
+                            <span class="text-muted text-decoration-line-through"><span class="math-inline">{{ product.discount|floatformat:2|intcomma }}</span></span>
+                            <span>${{ product.price|floatformat:2|intcomma }}</span>
+                            {% else %}
+                            <span>${{ product.price|floatformat:2|intcomma }}</span>
+                            {% endif %} 
+                            {% if product.discount %}
+                            <div class="badge bg-dark text-white" style="">
+                                Sale
+                            </div>
+                            {%endif%}
+                        </div>
+                    </div>
+                    <div class="card-footer p-4 pt-0 border-top-0 bg-transparent d-flex justify-content-center">
+                        <a class="btn btn-outline-dark mt-auto flex-grow-1"
+                            href="{% url 'product_details' product.slug %}">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-info text-center" role="alert">
+                <i class="fas fa-info-circle"></i>
+                Three is not offers in
+                products yet. Start
+                shopping and you well get coupon
+                now!
+            </div>
+            {% endif %} 
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock content %}

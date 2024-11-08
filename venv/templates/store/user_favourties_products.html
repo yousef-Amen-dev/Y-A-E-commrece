@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  .product-link {
+    color: #333;
+    text-decoration: none;
+}
+
+.product-link:hover {
+    color: #6c757d;
+    text-decoration: underline;
+}
+.card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card-img-top:hover {
+  transform: scale(1.05);
+  transition: transform 0.3s ease;
+}
+
+.badge {
+  font-size: 0.8rem;
+}
+
+.card-footer .btn {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-outline-danger:hover {
+  background-color: #ff4d4d;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  color: white;
+}
+
+</style>
+<div class="container my-5">
+    <h2 class="text-center mb-5">Your Favourite Products <i class="fas fa-heart text-danger"></i></h2>
+
+    {% if fav_products %}
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for product in fav_products %}
+                <div class="col">
+                    <div class="card shadow-sm h-100">
+                        <!-- Image with overlay effect -->
+                        <div class="position-relative">
+                            <img src="{{ product.image.url }}" class="card-img-top img-fluid" alt="{{ product.name }}" style="height: 250px; object-fit: cover;">
+                            <div class="position-absolute top-0 start-0 p-2">
+                                <span class="badge bg-success">FAVOURITE</span>
+                            </div>
+                        </div>
+
+                        <!-- Product Details -->
+                        <div class="card-body text-center">
+                          <a href="{% url 'product_details' product.slug %}" class="product-link">
+                              <h5 class="card-title">{{ product.name }}</h5>
+                          </a>
+                          <p class="card-text">Price: <span class="text-muted">${{ product.price }}</span></p>
+                      </div>
+                      
+
+                        <!-- Footer with interactive buttons -->
+                        <div class="card-footer bg-white border-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <!-- Button to remove from favourites -->
+                                <form action="{% url 'remove_favourite_product' product.slug %}" method="POST">
+                                    {% csrf_token %}
+                                    <button class="btn btn-outline-danger btn-sm">
+                                        <i class="fas fa-trash-alt"></i> Remove
+                                    </button>
+                                </form>
+                                
+                                <!-- Button to view product details -->
+                                <a href="{% url 'product_details' product.slug %}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-info-circle"></i> View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center" role="alert">
+            <i class="fas fa-info-circle"></i> You have no favourite products yet. Start adding your favourites now!
+        </div>
+    {% endif %}
+</div>
+{% endblock content %}

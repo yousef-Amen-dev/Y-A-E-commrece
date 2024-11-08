@@ -1,0 +1,289 @@
+{%extends 'base.html' %}
+{% load static %}
+{% block content %}
+  <style>
+    .related-products-link {
+      text-decoration: none;
+      color: #212529;
+      transition: color 0.3s ease;
+    }
+  
+    .related-products-link:hover {
+      color: #4b4f56;
+    }
+  
+    .product-card {
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+  
+    .product-card:hover {
+      transform: translateY(-10px);
+    }
+  
+    .card-body {
+      padding: 1.5rem;
+    }
+  
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+  
+    .anthor_image {
+      overflow: hidden; /* Ensures the image doesn't overflow outside its container */
+      border: 2px solid transparent; /* Initial border (transparent) */
+      border-radius: 5px; /* Slight rounding of the corners */
+      transition: border 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for the hover effects */
+  }
+  
+  /* Hover effect for the container */
+  .anthor_image:hover {
+      border-color: #abc1d9; /* Change border color on hover */
+      box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); /* Add a subtle shadow for depth */
+  }
+  /* Base style for the images */
+  .anthor-image-img {
+      transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for the hover effects */
+  }
+  
+  /* Hover effect */
+  .anthor-image-img:hover {
+      transform: scale(1.1); /* Slightly enlarge the image */
+      box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); /* Add a subtle shadow to give depth */
+  }
+
+    .quantity-label {
+      font-weight: 500;
+      padding-left: 1rem;
+    }
+
+  .product-name {
+    font-weight: bold;
+    font-size: 16px; 
+    line-height: 1.5;
+    margin-bottom: 5px; 
+}
+  .name-link {
+  color: #0f1111; 
+  text-decoration: none;
+  display: -webkit-box;
+  -webkit-line-clamp: 4; 
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis; 
+}
+
+  .name-link:hover {
+  color: #6c757d;
+  text-decoration: underline; 
+}
+
+  </style>
+<div class="container pt-5 pb-5">
+  {% for message in messages %}
+  <div class="alert alert-{{ message.tags }}" role="alert">
+    {{ message }}
+  </div>
+  {%endfor%}
+    <div class="row g-0">
+      <div class="d-flex justify-content-end align-items-center">
+        {% if user.is_authenticate %}
+        <form action="" method="POST">
+          {% csrf_token %}
+          <button class="btn p-0 border-0" value="{{product.id}}" id="add-fav">
+            <i class="{% if user in product.favourites.all %}fas{% else %}far{% endif %} fa-heart" 
+            id="heart-icon-{{ product.id }}" 
+            style="font-size: 24px; color: {% if user in product.favourites.all %}red{% else %}gray{% endif %};"></i>
+          </button>
+        </form>
+          {% endif %}
+        <!-- <span class="ms-2">{{ product.likes_count }}</span> -->
+    </div>
+      <div class="col-md-4 d-flex flex-column">
+        <img src="{{ product.image.url }}" class="rounded-start img-fluid img-cover anthor-image-img" style="height: 100%;" alt="...">
+      </div>
+      <div class="col-md-8 ps-3">
+        <div class="card-body">
+          <h5 class="card-title pb-2">{{product.name}}</h5>
+          
+          {% if product.description %}
+          <p class="card-text">{{product.description }}</p>
+          {% else %}
+          <p class="card-text"> {{product.description}} This is a wider card with supporting text below as a natural
+            lead-in to additional content. This content is a little bit longer.</p>
+          {% endif %}
+          <p class="card-text">Added: {{product.added}}<br><small class="text-muted">Last updated 3 mins ago</small></p>
+          {% if product.discount%}
+          <span class="card-text text-muted text-decoration-line-through">${{product.discount}}</span>
+          {{product.price}}$
+          {%else%}
+          <span class="card-text">Price:</span>
+          <span class="card-text">{{product.price}}$</span>
+          <br>
+          {%endif%}
+          <span class="card-text">in Stock:</span>
+          <span class="card-text">{{product.instock}}</span>
+          <div class="d-flex small text-warning mb-2">
+            <div class="bi-star-fill"></div>
+            <div class="bi-star-fill"></div>
+            <div class="bi-star-fill"></div>
+            <div class="bi-star-fill"></div>
+          </div>
+          
+        </div>
+        <!-- anthor product image -->
+      <div class="container pt-2 ">
+          <div class="row">
+
+            {% if product.image_two %}
+              <div class="col-md-2 mb-2 anthor_image ms-2">
+                <img src="{{ product.image_two.url }}" 
+                class="img-fluid rounded img-cover anthor-image-img " 
+                alt="Additional image of products">
+              </div>
+            {%endif%}
+
+            {% if product.image_three %}
+              <div class="col-md-2 mb-2 anthor_image ms-2">
+                <img src="{{ product.image_three.url }}" 
+                class="img-fluid rounded img-cover anthor-image-img" 
+                alt="Additional image of products">
+              </div>
+            {% endif %}
+
+            {% if product.image_foure %}
+                <div class="col-md-2 mb-2 anthor_image ms-2">
+                  <img src="{{ product.image_foure.url }}" 
+                  class="img-fluid rounded img-cover anthor-image-img  " 
+                  alt="Additional image of products">
+                </div>
+            {% endif %}
+          </div>
+        </div>
+
+
+        <label class="ps-3 quantity-label">Quantity</label>
+        <div class="row ps-3 pt-1">
+          <div class="col-md-2">
+            <select class="form-select" id="qty-cart">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-footer p-4 pt-5 border-top-0 bg-transparent d-flex justify-content-center">
+          <a class="btn btn-outline-dark mt-auto flex-grow-1" href="{% url 'chackout_shipping_address'  %}">Buy Now</a>
+          <form action="" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-dark t btn-sm ms-3" value="{{product.id}}" id="add-cart"> <i
+                class="fa-solid fa-cart-shopping"></i>
+            </button>
+          </form>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- realated products -->
+  <hr style="border:0.70px rgb(111, 110, 110) solid; margin-top:80px  ">
+  <div class="pb-5 ms-4">
+    <h3 class="">Shop More Favorites You'll Adore</h3>
+  </div>
+  <div class="row pt-3 ">
+    {% for related_product in related_products %}
+    <div class="col-md-4 mb-3 product-card">
+      <a class="related-products-link fw-bolder text-decoration-none product-name" href="{% url 'product_details' related_product.slug %}">
+        <div class="card">
+          <img src="{{ related_product.image.url }}" class="card-img-top img-cover" alt="...">
+          <div class="card-body product_name">
+            {% if related_product.name%}
+            <h5 class="card-text name-link">{{related_product.name}}</h5>
+            {%else%}
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
+              content.</p>
+            {%endif%}
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+
+
+
+<script>
+  $(document).on('click', '#add-cart', function (e) {
+    e.preventDefault();
+    $.ajax({
+      type: 'POST',
+      url: "{% url 'add_cart' %}",
+      data: {
+        product_id: $('#add-cart').val(),
+        product_qty: $('#qty-cart option:selected').text(),
+        csrfmiddlewaretoken: '{{csrf_token}}',
+        action: 'post'
+      },
+      success: function (json) {
+        //console.log(json)
+        document.getElementById('cart-quantity').
+          textContent = json.qty
+      },
+      error: function (xhr, errmsg, err) {
+      }
+    });
+  })
+
+
+$(document).on('click', '#add-fav', function (e) {
+    e.preventDefault();
+    
+    $.ajax({
+      type: 'POST',
+      url: "{% url 'add_favourites_products' %}",
+      data: {
+        product_id: $('#add-fav').val(),
+        csrfmiddlewaretoken: '{{csrf_token}}',
+        action: 'post'
+      },
+      success: function (json) {
+        var icon = $('#heart-icon-' + $('#add-fav').val());
+        if (json.action === 'added') {
+            icon.removeClass('far').addClass('fas').css('color', 'red');
+            showMessage('Product added to favourites successfully!', 'success');
+        } else if (json.action === 'removed') {
+            icon.removeClass('fas').addClass('far').css('color', 'gray');
+            showMessage('Product removed from favourites.', 'info');
+        }
+    },
+      error: function (xhr, errmsg, err) {
+        console.error(`Error: ${errmsg}`);
+      }
+    });
+  })
+  function showMessage(message, type) {
+    // Remove any existing alert message
+    $('.alert').remove();
+    
+    // Create the alert div dynamically
+    var alertHtml = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>`;
+    
+    // Append the alert to a specific part of your page, e.g., a container for messages
+    $('#message-container').append(alertHtml);
+    
+    // Optionally, you can set the message to disappear after a few seconds
+    setTimeout(function () {
+        $('.alert').alert('close');
+    }, 3000);
+  }
+
+</script>
+
+{% endblock content %}

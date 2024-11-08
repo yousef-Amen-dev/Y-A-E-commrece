@@ -1,0 +1,69 @@
+{% extends 'base.html'%}
+
+
+{% block content %}
+
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }}" role="alert">
+    {{ message }}
+  </div>
+{%endfor%}
+<header class="bg-dark py-5" >
+  <div class="container px-4 px-lg-5 my-5">
+      <div class="text-center text-white">
+          <h1 class="display-4 fw-bolder">Shopping in Online</h1>
+          <p class="lead fw-normal text-white-80 mb-0">YA-Ecommers The Best Online Ecommers in The World.</p>
+      </div>
+  </div>
+</header>
+<div class="container mt-5">
+  {% if shipping_addresses %}
+    <h2>Your Shipping Addresses Choose One Of Theem For This Order</h2>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Full Name</th>
+          <th>Address Line 1</th>
+          <th>Address Line 2</th>
+          <th>Building Name</th>
+          <th>City</th>
+          <th>State/Province</th>
+          <th>Postal Code</th>
+          <th>Country</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for address in shipping_addresses %}
+          <tr>
+            <td>{{ address.shipping_full_name }}</td>
+            <td>{{ address.shipping_address1 }}</td>
+            <td>{{ address.shipping_address2 }}</td>
+            <td>{{ address.building_name }}</td>
+            <td>{{ address.shipping_city }}</td>
+            <td>{{ address.shipping_state }}</td>
+            <td>{{ address.shipping_zipcode }}</td>
+            <td>{{ address.shipping_country }}</td>
+            <td>
+              <a href="{% url 'update_shipping_address' address.token %}" class="btn btn-primary btn-sm ">Update</a>
+              <a href="{% url 'delete_shipping_address' address.token %}" class="btn btn-danger btn-sm">Remove</a>
+              <a href="{% url 'confirm_order_proccess' address.token %}" class="btn btn-outline-secondary btn-sm mt-1">Use Shipping Address</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p>Select a shipping address or <a href="{% url 'add_shipping_address' %}">add a new one</a>.</p>
+  {% else %}
+    <p>You have no shipping addresses. <a href="{% url 'add_shipping_address' %}">Add a new one</a>.</p>
+  {% endif %}
+</div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+{% endblock %}

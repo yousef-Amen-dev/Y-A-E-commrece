@@ -1,0 +1,28 @@
+{% extends 'base.html' %} 
+{%block content %}
+<header class="bg-dark py-5" >
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="text-center text-white">
+            <h1 class="display-4 fw-bolder">Shopping in Online</h1>
+            <p class="lead fw-normal text-white-80 mb-0">YA-Ecommers The Best Online Ecommers in The World.</p>
+        </div>
+    </div>
+</header>
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card p-4">
+                <h4 class="card-title text-center">Billing Information</h4>
+                <form method="POST" >
+                    {% csrf_token %}
+                    {{ payment_form.as_p }}
+                    <button type="submit" class="btn btn-outline-secondary btn-block mt-3">
+                        Pay Now
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    </div>
+{% endblock content %}

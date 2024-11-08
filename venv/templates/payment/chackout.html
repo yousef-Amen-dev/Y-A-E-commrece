@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }}" role="alert">
+    {{ message }}
+  </div>
+{%endfor%}
+<header class="bg-dark py-5">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="text-center text-white">
+            <h1 class="display-4 fw-bolder">Chackout</h1>
+            <p class="lead fw-normal text-white-80 mb-0">YA-Ecommers The Best Online Ecommers in The World.</p>
+        </div>
+    </div>
+</header>
+
+  {% for product in cart_products %}
+ <div class="product-card d-flex flex-row align-items-center border-bottom border-light py-4 px-3">
+  <div class="product-image col-md-3">
+    <img src="{{ product.image.url }}" alt="{{ product.name }} Image" class="img-fluid rounded">
+  </div>
+  <div class="product-details col-md-8 ms-2">
+    <div class="product-info d-flex justify-content-between mb-2">
+      <h5 class="product-name text-dark">{{ product.name }}</h5>
+      <div class="product-price">
+        {% if product.discount %}
+          <span class="text-muted text-decoration-line-through">${{ product.discount }}</span>
+        {% endif %}
+        <span class="ms-2 fw-bold">${{ product.price }}</span>
+      </div>
+    </div>
+    <div class="product-meta d-flex flex-wrap">
+      <span class="text-muted me-2">Category:</span>
+      <span class="badge bg-dark rounded">{{ product.category }}</span>
+      <span class="text-muted ms-2">Quantity:</span>
+      {% for key,value in quantity.items %}
+      {% if key == product.id|slugify %}
+      <span class="badge bg-dark ms-1 rounded">{{ value }}</span>
+      {%endif%}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<div class="cart-footer d-flex justify-content-between py-3 px-3 border-top border-light">
+  <h5 class="text-muted">Total Price: <span class="ms-2 text-dark">${{ total_price }}</span></h5>
+  <div class="buttons d-flex gap-2">
+    <a href="{% url 'summary_cart' %}" class="btn btn-primary btn-sm">Update Items</a>
+    <a href="{% url 'chackout_shipping_address' %}" class="btn btn-outline-secondary btn-sm">Continue Checkout</a>
+  </div>
+</div>
+{% endblock content %}

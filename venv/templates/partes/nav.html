@@ -1,0 +1,101 @@
+{% load static %}
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid px-4 px-lg-5">
+        <a class="navbar-brand" href="{% url 'home' %}">YA-Ecommres</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'contact_us' %}">ContactUs</a></li>
+                {% if user.is_staff %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">Products</a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li class="nav-item"><a class="dropdown-item" href="{% url 'add_products' %}">Add Products</a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider" />
+                        </li>
+                        <li class="nav-item"><a class="dropdown-item" href="{% url 'update_products' %}">Update
+                                Products</a></li>
+                    </ul>
+                </li>
+                {%endif%}
+                {% if user.is_authenticated and user.is_staff %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">Orders</a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li class="nav-item"><a class="dropdown-item" href="{% url 'shipped_orders_dashboard' %}">Shipped Orders</a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider" />
+                        </li>
+                        <li class="nav-item"><a class="dropdown-item" href="{% url 'unshipped_orders_dashboard' %}">Un-Shipped Orders
+                        </a></li>
+                    </ul>
+                </li>
+                {% endif %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">Categories</a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="{% url 'all_categories' %}">All Categories</a></li>
+                        <li>
+                            <hr class="dropdown-divider" />
+                        </li>
+                        {% for category in categories|slice:'4' %}
+                        {% if category.product_set.all %}
+                        <li><a class="dropdown-item" href="{% url 'category' category.name %}">{{category.name}}</a></li>
+                        {%endif%}
+                        {% endfor %}
+                        <li>
+                            <hr class="dropdown-divider" />
+                        </li>
+                        <li><a class="dropdown-item" href="{% url 'popular_products' %}">Popular Items</a></li>
+                        <li><a class="dropdown-item" href="{% url 'offers_product' %}">Offers</a></li>
+                        {% if user.is_staff %}
+                        <li><a class="dropdown-item" href="{% url 'add_categories' %}">Add Category</a></li>
+                        {%endif%}
+                        <li><a class="dropdown-item" href="{% url 'most_selled_products' %}">Most Selled</a></li>
+                    </ul>
+                    {% if not user.is_authenticated %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'signup' %}">Sign Up</a></li>
+                {%endif%}
+                </li>
+            </ul>
+            <form method="GET" action="{% url 'search_products' %}" class="d-flex me-3">
+                <input class="form-control form-control-sm me-2" type="search" placeholder="Search" aria-label="Search"
+                    name="search_name">
+                <button class="btn btn-outline-dark btn-sm" type="submit">Search</button>
+            </form> 
+            {% if user.is_staff %}
+           
+            {% else %}
+            <a class="btn btn-outline-dark me-3" href="{% url 'summary_cart' %}">
+                <i class="bi-cart-fill me-1"></i>
+                <span id="cart-quantity" class="badge bg-dark text-white ms-1 rounded-pill">{{cart|length}}</span>
+            </a>
+            {% endif %}
+            {% if user.is_authenticated %}
+            <div class="image-container">
+
+            <a class="nav-link active" aria-current="page" href="{% url 'profile' %}">
+                {% if user.profile.profile_image %}
+                <img style="width:40px" class="img-fluid rounded-circle img-cover"  src="{{ user.profile.profile_image.url }}"></img>
+                {% else %}
+                <img src="{% static 'images/default_website_images/default-image-writer.png' %}" alt="Profile Image" class="img-fluid rounded-circle" width="40px">
+                {% endif %}
+            </a>
+        </div>
+    {%endif%}
+        </div>
+    </div>
+</nav>
