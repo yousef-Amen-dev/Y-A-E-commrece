@@ -16,8 +16,8 @@ urlpatterns = [
   path('add_shipping_address/',add_shippingAddress,name = 'add_shipping_address'),
   path('update_shipping_address/<str:token>/',update_shipping_address,name = 'update_shipping_address'),
   path('delete_shipping_address/<str:token>/',delete_shipping_address,name = 'delete_shipping_address'),
-  path('confirm_order_proccess=?<str:token>/',order_process, name = 'confirm_order_proccess'),
-  path('billing_info=?<str:order_uuid>/',billing_info, name = 'billing_info'),
+  path('order_process=?<str:token>/',order_process, name = 'order_process'),
+  path('billing_info/',billing_info, name = 'billing_info'),
   path('payment_process/',payment_process, name = 'payment_process'),
   # shipped and unshipped page for the admin 
   path('shipped_orders_dashboard/',shipped_orders_dashboard,name = 'shipped_orders_dashboard'),

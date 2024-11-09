@@ -47,7 +47,7 @@
             <td>
               <a href="{% url 'update_shipping_address' address.token %}" class="btn btn-primary btn-sm ">Update</a>
               <a href="{% url 'delete_shipping_address' address.token %}" class="btn btn-danger btn-sm">Remove</a>
-              <a href="{% url 'confirm_order_proccess' address.token %}" class="btn btn-outline-secondary btn-sm mt-1">Use Shipping Address</a>
+              <a href="{% url 'order_process' address.token %}" class="btn btn-outline-secondary btn-sm mt-1">Use Shipping Address</a>
             </td>
           </tr>
         {% endfor %}

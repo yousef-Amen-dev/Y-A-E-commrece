@@ -50,16 +50,17 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware'
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Added missing comma here
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'store.middleware.AdminOnlyMiddleware',
     'payment.middleware.AdminOnlyMiddleware',
 ]
+
 
 ROOT_URLCONF = 'ecom.urls'
 
@@ -133,10 +134,10 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = ['ecom/static/']
+STATICFILES_DIRS = ["ecom/static/",]
 
 # whitenoise static files settings
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage",
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
 

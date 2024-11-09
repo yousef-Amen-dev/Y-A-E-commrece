@@ -7,6 +7,8 @@ from .models import (ShippingAddress)
 from django.contrib.auth.decorators import login_required
 from store.models import Product
 from members.models import Profile
+from decimal import Decimal
+from django.db import transaction
 
 
 def chackout(request):
@@ -97,77 +99,191 @@ def delete_shipping_address(request,token):
     return redirect('chackout_shipping_address')
 
 
-def order_process(request,token):
-  if request.user.is_authenticated:
-      cart = Cart(request)
-      total = cart.total_price()
-      products = cart.get_products()
-      quantity = cart.get_quantitys()
-      try:
-        shipping_address = ShippingAddress.objects.get(token = token)
-        shipping_address_summary = f"{shipping_address.shipping_full_name}\n{shipping_address.shipping_email}\n{shipping_address.shipping_address1}\n{shipping_address.shipping_address2}\n{shipping_address.shipping_phone}\n{shipping_address.building_name}\n{shipping_address.shipping_state}\n{shipping_address.shipping_city}\n{shipping_address.shipping_zipcode}\n{shipping_address.shipping_country}"
-        try:
-          global order
-          order = Order(
-            shipping_address         = shipping_address,
-            user                     = request.user,
-            amount                   = total,
-            email                    = shipping_address.shipping_email,
-            full_name                = shipping_address.shipping_full_name,
-            summary_shipping_address = shipping_address_summary
-            )
+# def order_process(request,token):
+#   if request.user.is_authenticated:
+#       cart = Cart(request)
+#       total = cart.total_price()
+#       products = cart.get_products()
+#       quantity = cart.get_quantitys()
+#       try:
+#         shipping_address = ShippingAddress.objects.get(token = token)
+#         shipping_address_summary = f"{shipping_address.shipping_full_name}\n{shipping_address.shipping_email}\n{shipping_address.shipping_address1}\n{shipping_address.shipping_address2}\n{shipping_address.shipping_phone}\n{shipping_address.building_name}\n{shipping_address.shipping_state}\n{shipping_address.shipping_city}\n{shipping_address.shipping_zipcode}\n{shipping_address.shipping_country}"
+#         try:
+#           global order
+#           order = Order(
+#             shipping_address         = shipping_address,
+#             user                     = request.user,
+#             amount                   = total,
+#             email                    = shipping_address.shipping_email,
+#             full_name                = shipping_address.shipping_full_name,
+#             summary_shipping_address = shipping_address_summary
+#             )
 
-          context = {'order':order,'cart_products':products,'quantity':quantity}
-          return render(request,'payment/order_details.html',context)
-        except Exception as error:
-          return messages.error(request,f'{error}')
-      except ShippingAddress.DoesNotExist:
-        messages.error(request,'Invalid Shipping Adddress.')
-        return redirect('chackout')
+#           context = {'order':order,'cart_products':products,'quantity':quantity}
+#           return render(request,'payment/order_details.html',context)
+#         except Exception as error:
+#           return messages.error(request,f'{error}')
+#       except ShippingAddress.DoesNotExist:
+#         messages.error(request,'Invalid Shipping Adddress.')
+#         return redirect('chackout')
     
-  else:
-    messages.warning(request,'You must be logged in to proceed with payment.')
-    return redirect('login') 
+#   else:
+#     messages.warning(request,'You must be logged in to proceed with payment.')
+#     return redirect('login') 
 
 
-def billing_info(request,order_uuid):
-  if request.user.is_authenticated:
-    cart = Cart(request)
-    total = cart.total_price()
-    products = cart.get_products()
-    quantity = cart.get_quantitys()
-    if request.method == "POST":
-      try:
-        user_filter_order = Order.objects.filter(user= request.user)
-        order.save()
-        for product in products:
-          for key,value in quantity.items():
-            key = int(key)
-            if key  == product.id :
-              create_order_item = OrderItem.objects.get_or_create(
-                order       = order,
-                products    = product,
-                user        = request.user,
-                price       = product.price,
-                quantity    = value,
-                )
-        for key in list(request.session.keys()):
-            if key == "session_key":
-              del request.session[key]
-        # delete cart from database 
-        current_user = Profile.objects.get(user =  request.user)
-        current_user.cart = ""
-        current_user.save()
-        return redirect('payment_process')
-      except Exception as error:
-        messages.info(request,f'Order Is Not Placed Please Try Agine.{error}')
-        return redirect('/')
-    billing_forms = PaymentForm()
-    context = {'payment_form':billing_forms,}
-    return render(request,'payment/billing_info.html',context)
-  else:
-      messages.warning(request,'You must be logged in to proceed with payment.')
-      return redirect('/')
+# def billing_info(request,order_uuid):
+#   if request.user.is_authenticated:
+#     cart = Cart(request)
+#     total = cart.total_price()
+#     products = cart.get_products()
+#     quantity = cart.get_quantitys()
+#     if request.method == "POST":
+#       try:
+#         user_filter_order = Order.objects.filter(user= request.user)
+#         order.save()
+#         for product in products:
+#           for key,value in quantity.items():
+#             key = int(key)
+#             if key  == product.id :
+#               create_order_item = OrderItem.objects.get_or_create(
+#                 order       = order,
+#                 products    = product,
+#                 user        = request.user,
+#                 price       = product.price,
+#                 quantity    = value,
+#                 )
+#         # delete the session_key
+#         for key in list(request.session.keys()):
+#             if key == "session_key":
+#               del request.session[key]
+#         # delete cart from database 
+#         current_user = Profile.objects.get(user =  request.user)
+#         current_user.cart = ""
+#         current_user.save()
+#         return redirect('payment_process')
+      
+#       except Exception as error:
+#         messages.info(request,f'Order Is Not Placed Please Try Agine.{error}')
+#         return redirect('/')
+    
+#     billing_forms = PaymentForm()
+#     context = {'payment_form':billing_forms,}
+#     return render(request,'payment/billing_info.html',context)
+
+#   else:
+#       messages.warning(request,'You must be logged in to proceed with payment.')
+#       return redirect('/')
+
+
+def order_process(request, token):
+    if request.user.is_authenticated:
+        cart = Cart(request)
+        total = float(cart.total_price())
+        products = cart.get_products()
+        quantity = cart.get_quantitys()
+        
+        try:
+            shipping_address = ShippingAddress.objects.get(token=token)
+            shipping_address_summary = (
+                f"{shipping_address.shipping_full_name}\n"
+                f"{shipping_address.shipping_email}\n"
+                f"{shipping_address.shipping_address1}\n"
+                f"{shipping_address.shipping_address2}\n"
+                f"{shipping_address.shipping_phone}\n"
+                f"{shipping_address.building_name}\n"
+                f"{shipping_address.shipping_state}\n"
+                f"{shipping_address.shipping_city}\n"
+                f"{shipping_address.shipping_zipcode}\n"
+                f"{shipping_address.shipping_country}"
+            )
+          
+            order = Order(
+                shipping_address=shipping_address,
+                user=request.user,
+                amount=total,
+                email=shipping_address.shipping_email,
+                full_name=shipping_address.shipping_full_name,
+                summary_shipping_address=shipping_address_summary
+            )
+            # Store order details in session as a dictionary (not as an object)
+            request.session['order_data'] = {
+                'shipping_address_id': shipping_address.id,
+                'user_id': request.user.id,
+                'amount': total,
+                'email': shipping_address.shipping_email,
+                'full_name': shipping_address.shipping_full_name,
+                'summary_shipping_address': shipping_address_summary
+            }
+            
+            context = {'order':order,'cart_products': products, 'quantity': quantity}
+            return render(request, 'payment/order_details.html', context)
+        
+        except ShippingAddress.DoesNotExist:
+            messages.error(request, 'Invalid Shipping Address.')
+            return redirect('checkout')
+    else:
+        messages.warning(request, 'You must be logged in to proceed with payment.')
+        return redirect('login')
+
+
+def billing_info(request):
+    if request.user.is_authenticated:
+        cart = Cart(request)
+        total = cart.total_price()
+        products = cart.get_products()
+        quantity = cart.get_quantitys()
+
+        if request.method == "POST":
+            try:
+                # Retrieve the order data from session
+                with transaction.atomic():
+                  order_data = request.session.get('order_data')
+                  if not order_data:
+                      messages.error(request, 'Order not found. Please start the order process again.')
+                      return redirect('checkout')
+
+                  # Create and save the order instance
+                  order = Order.objects.create(
+                      shipping_address_id=order_data['shipping_address_id'],
+                      user_id=order_data['user_id'],
+                      amount=order_data['amount'],
+                      email=order_data['email'],
+                      full_name=order_data['full_name'],
+                      summary_shipping_address=order_data['summary_shipping_address']
+                  )
+
+                  # Create OrderItems for each product in the cart
+                  for product in products:
+                      product_quantity = quantity.get(str(product.id), 0)
+                      if product_quantity > 0:
+                          OrderItem.objects.get_or_create(
+                              order=order,
+                              products=product,
+                              user=request.user,
+                              price=product.price,
+                              quantity=product_quantity
+                          )
+                  
+                  # Clear the session and cart
+                  for key in list(request.session.keys()):
+                    if key == "session_key":
+                      del request.session[key]
+                  Profile.objects.filter(user=request.user).update(cart="")
+                  
+                messages.success(request,f'Order Pleced Successfully {request.user.profile.first_name}.')
+                return redirect('/')
+            
+            except Exception as error:
+                messages.info(request, f'Order not placed. Please try again: {error}')
+                return redirect('/')
+
+        billing_forms = PaymentForm()
+        context = {'payment_form': billing_forms}
+        return render(request, 'payment/billing_info.html', context)
+    else:
+        messages.warning(request, 'You must be logged in to proceed with payment.')
+        return redirect('login')
 
 
 def user_orders(request):
