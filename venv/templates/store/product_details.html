@@ -87,9 +87,10 @@
     {{ message }}
   </div>
   {%endfor%}
+  <div id="message-container"></div>
     <div class="row g-0">
       <div class="d-flex justify-content-end align-items-center">
-        {% if user.is_authenticate %}
+        {% if user.is_authenticated %}
         <form action="" method="POST">
           {% csrf_token %}
           <button class="btn p-0 border-0" value="{{product.id}}" id="add-fav">
@@ -99,7 +100,6 @@
           </button>
         </form>
           {% endif %}
-        <!-- <span class="ms-2">{{ product.likes_count }}</span> -->
     </div>
       <div class="col-md-4 d-flex flex-column">
         <img src="{{ product.image.url }}" class="rounded-start img-fluid img-cover anthor-image-img" style="height: 100%;" alt="...">
@@ -266,24 +266,25 @@ $(document).on('click', '#add-fav', function (e) {
     });
   })
   function showMessage(message, type) {
+    console.log("Showing message:", message, "Type:", type); // Debugging
+
     // Remove any existing alert message
     $('.alert').remove();
-    
+
     // Create the alert div dynamically
     var alertHtml = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
                         ${message}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>`;
-    
-    // Append the alert to a specific part of your page, e.g., a container for messages
+
+    // Append the alert to the message container
     $('#message-container').append(alertHtml);
-    
+
     // Optionally, you can set the message to disappear after a few seconds
     setTimeout(function () {
         $('.alert').alert('close');
     }, 3000);
   }
-
 </script>
 
 {% endblock content %}

@@ -6,9 +6,11 @@ from .forms import (Add_Products_Form,Add_Category_Form,Contact_Us_Form)
 from django.contrib import messages
 from django.db.models import Q
 from payment.models import OrderItem,Order
-from django.db.models import Count, OuterRef, Subquery,Sum
+from django.db.models import Count,Sum
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.db import transaction
+
 
 # home page showing the products 
 def home(request):
@@ -66,23 +68,16 @@ def discount_products(request):
 # add products function to can added products from the website only admins or staff can use this function
 def add_products(request):
   if request.method == 'POST':
-
     # add the product info in the add_products form
     product_form = Add_Products_Form(request.POST,request.FILES)
-
     if product_form.is_valid():
 
       # save the products
       product_form.save()
-
-      # return success message
       messages.success(request,'Product Add Successfully')
-
       return redirect('/')
     else:
-
       messages.info(request,'Product Is Not Add Please Chack The Product Informations And Try Agine..')
-  
   product_form = Add_Products_Form()
 
   context = {'forms':product_form}
@@ -100,14 +95,11 @@ def update_products(request):
 # update products function only admins or staff can use this function 
 def update_product(request,slug):
   product = Product.objects.get(slug=slug)
-  # chack if request equal POST
   if request.method == 'POST':
-    # add the product new information in the form
     form = Add_Products_Form(request.POST,request.FILES,instance=product)
     if form.is_valid():
       # save the the new informations in database
       form.save()
-      # success message
       messages.success(request,'Product Updated Successfully..')
       return redirect('/')
     else:
@@ -124,7 +116,6 @@ def delete_products(request,slug):
     if request.method == "POST":
         # delete the product
         product.delete()
-        # success message
         messages.success(request,'Product Deleted Successfully..')
         return redirect('/')
     context = {'product':product}
@@ -141,7 +132,6 @@ def add_categories(request):
     if category_form.is_valid():
       # save the category in database
       category_form.save()
-      # return success message
       messages.success(request,'Category Add Successfully')
       return redirect('/')
     else:
@@ -150,25 +140,29 @@ def add_categories(request):
   context = {'forms':category_form}
   return render(request,'store/add_categories.html',context)
 
+
 # add products function to can added products from the website
 def contact_us(request):
+  user = request.user
   if request.method == 'POST' :
-    if request.user.is_authenticated:
-      contact_form = Contact_Us_Form(request.POST)
-      if contact_form.is_valid():
-        #  don't save the meesage before connect the meesage with the user
-        contact = contact_form.save(commit=False)
-        # connect the request user with the Contact US model to tell him the message related to this user
-        contact.user = request.user
-        contact.save()
-        # return success message
-        if request.user.profile.gender == 'Male':
-          messages.success(request,f'Your Message Sended Successfully You Well Get The Answer Soon Mr {request.user.profile.first_name}')
+    if user.is_authenticated:
+      # Use the transaction to ensure the complete success of the code, if there is any error the code will be defeated
+      with transaction.atomic():
+        contact_form = Contact_Us_Form(request.POST)
+        if contact_form.is_valid():
+          #  don't save the meesage before connect the meesage with the user
+          contact = contact_form.save(commit=False)
+          # connect the request user with the Contact US model to tell him the message related to this user
+          contact.user = user
+          contact.save()
+
+          if request.user.profile.gender == 'Male':
+            messages.success(request,f'Your Message Sended Successfully You Well Get The Answer Soon Mr {user.profile.first_name}')
+          else:
+            messages.success(request,f'Your Message Sended Successfully You Well Get The Answer Soon Miss {user.profile.first_name}')
+          return redirect('/')
         else:
-          messages.success(request,f'Your Message Sended Successfully You Well Get The Answer Soon Miss {request.user.profile.first_name}')
-        return redirect('/')
-      else:
-        messages.info(request,f'Your Message Not Sended Please Chack The Informations And Try Agine!')
+          messages.info(request,f'Your Message Not Sended Please Chack The Informations And Try Agine!')
     else:
       messages.info(request,'You Have To Sign Up First And Return To Send The Message!')
       return redirect('signup')
@@ -176,7 +170,7 @@ def contact_us(request):
   context = {'form':contact_form}
   return render(request,'store/contact_us.html',context)
 
-# search product function
+
 def search_products(request):
   all_product  = Product.objects.all()
   if 'search_name' in request.GET:
@@ -208,17 +202,23 @@ def add_favourites_products(request):
     return JsonResponse({'action': action})
 
 
+# user favourite page the display user favourite products 
 def user_favourites_products_page(request):
-  fav_products = Product.objects.filter(favourites=request.user )
+  user  = request.user
+  fav_products = Product.objects.filter(favourites=user )
   context = {'fav_products':fav_products}
   return render(request,'store/user_favourties_products.html',context)
 
 
+# to remove products from user favourite products 
 def remove_favourite_product(request,slug):
   if request.method == "POST":
     product = get_object_or_404(Product, slug=slug)
+
     user  = request.user
+    # check if user is already liked the product 
     if product.favourites.filter(id = user.id).exists():
+      # remove the product from user favourite products
       product.favourites.remove(user)
       messages.success(request,'Product Removed From Your Favourite Products Successfully.')
     else:
@@ -226,18 +226,21 @@ def remove_favourite_product(request,slug):
     return redirect('/')
 
 
-def popular_products(request):
-  products_with_id = Product.objects.values('id').annotate(likes_count = Count('favourites')).order_by('-likes_count')[:5]
+def popular_products(request,num_products=10):
+  # get the products id and use the annotate function to add likes_count filed to count favourites 
+  products_with_id = Product.objects.values('id').annotate(likes_count = Count('favourites')).order_by('-likes_count')[:num_products]
+  print(products_with_id)
   # extract the products ids in list
   extract_products = products_with_id.values_list('id',flat = True)
   products = Product.objects.filter(id__in=extract_products) \
     .annotate(likes_count=Count('favourites')) \
-    .order_by('-likes_count')[:10]
+    .order_by('-likes_count')[:num_products]
+  print(products)
   context  = {'products':products}
   return render(request,'store/popular_products.html',context)
 
 
-def most_sold_products(request, num_products=5):
+def most_sold_products(request, num_products=10):
   # get the product ids with quantity and order him total_quantity the most sold product will be appear first
   product_ids_with_quantity = OrderItem.objects.values('products_id')  \
     .annotate(total_quantity=Sum('quantity')) \
