@@ -6,18 +6,18 @@ from members.models import Profile
 from django.core.validators import MinLengthValidator
 from django.template.defaultfilters import slugify
 
-# category of products
 class Category(models.Model):
   name                = models.CharField(max_length =500,default=None,verbose_name='Category Name',validators=[
     MinLengthValidator(3,'the field must contain at least 20 character')
   ])
+
   class Meta:
     verbose_name_plural = 'Categories'
+
   def __str__(self):
     return self.name
 
 
-# products class to create 
 class Product(models.Model):
   product_model        = models.CharField(max_length =1000,default=None,validators=[
     MinLengthValidator(3,'the field must contain at least 3 character')],null=True,blank=True,verbose_name='Product Brand')
@@ -39,7 +39,7 @@ class Product(models.Model):
   slug                = models.SlugField(null=True,blank = True,max_length=1500) 
   added               = models.DateTimeField(auto_now_add=True)
 
-  # make the discount and save
+  # make the discount auto and save
   def save(self,*args,**kwargs):
     if self.discount:
       self.price -= self.discount
@@ -50,8 +50,6 @@ class Product(models.Model):
     return self.name
 
 
-
-# contact us class to reborts
 class Contact_Us(models.Model):
   name          = models.CharField(max_length=50,default=None)
   email         = models.EmailField(max_length=100,default=None)
@@ -59,9 +57,7 @@ class Contact_Us(models.Model):
   user          = models.ForeignKey(User,on_delete=models.CASCADE)
 
   class Meta:
-    # change the name of model in the in admin panle
     verbose_name_plural = 'Contact Us'
-
+  
   def __str__(self):
     return self.email
-

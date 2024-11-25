@@ -6,9 +6,7 @@ from members.models import Profile
 from django.contrib import messages
 
 
-# summary cart function
 def summary_cart(request):
-  # get the cart
   cart = Cart(request)
   products = cart.get_products
   all_products= Product.objects.all()
@@ -33,28 +31,19 @@ def summary_cart(request):
   return render(request,'cart/summary_page.html',context)
 
 
-# view cart function
 def view_cart(request):
   return render(request,'cart/update.html',context)
 
 
-# add cart function
 def add_cart(request):
-  # get the Cart Class
   cart = Cart(request)
-  #  chack if the action is equal post
   if request.POST.get('action') == 'post':
     # lookup products in database
     product_id = int(request.POST.get('product_id'))
-    # get the cart quantity
     product_qty = int(request.POST.get('product_qty'))
-    # get the products from the Product model
     product    = get_object_or_404(Product,id=product_id)
-    # save the session 
     cart.add(product=product,product_qty=product_qty)
-    # get the cart products length
     cart_qty = cart.__len__()
-    # return response
     response = JsonResponse({'qty':cart_qty,'product name':product.name})
     return response
 
@@ -63,23 +52,18 @@ def add_cart(request):
 def delete_cart(request):
   cart = Cart(request)
   if request.POST.get('action') == 'post':
-    #  get the product id from the template
     product_id =int(request.POST.get('product_id'))
-    # call delete fucntion from cart
     cart.delete(product = product_id)
-    # return response
     response = JsonResponse({'product':product_id})
     return response
     return redirect('summary_cart')
 
 
-# update products in cart
 def update_cart(request):
   cart = Cart(request)
   if request.POST.get('action') == 'post':
-    # get the product id
+    # get the product id and product quantity
     product_id =int( request.POST.get('product_id'))
-    # get the quantity
     product_qty = int(request.POST.get('product_qty'))
     # update the cart
     cart.update(product=product_id,product_qty = product_qty)

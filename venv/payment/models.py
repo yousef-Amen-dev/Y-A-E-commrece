@@ -87,7 +87,17 @@ class ShippingAddress(models.Model):
     verbose_name_plural = 'Shipping Address'
 
   def __str__(self):
-    return f"{self.shipping_full_name}\n{self.shipping_email}\n{self.shipping_address1}\n{self.shipping_address2}\n{self.shipping_phone}\n{self.building_name}\n{self.shipping_state}\n{self.shipping_city}\n{self.shipping_zipcode}\n{self.shipping_country}"
+    return f"""
+    {self.shipping_full_name}
+    \n{self.shipping_email}
+    \n{self.shipping_address1}
+    \n{self.shipping_address2}
+    \n{self.shipping_phone}
+    \n{self.building_name}
+    \n{self.shipping_state}
+    \n{self.shipping_city}
+    \n{self.shipping_zipcode}
+    \n{self.shipping_country}"""
 
 
 class Order(models.Model):
@@ -104,7 +114,7 @@ class Order(models.Model):
   def __str__(self):
     return f'Order-Email : {self.email}'
 
-
+# add the date time when the product marked as shipped
 @receiver(pre_save, sender=Order)
 def set_shipped_date(sender,instance,**kwargs):
   if instance.pk and instance.shipped:

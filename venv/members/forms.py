@@ -55,6 +55,7 @@ class UserProfileForm(forms.ModelForm):
 			'country':forms.Select(attrs={'class':'form-control','placeholder':'Enter Your Countery'}),
 		} 
 
+
 class ChangePasswordForm(PasswordChangeForm):
 		def __init__(self, *args, **kwargs):
 			super(PasswordChangeForm, self).__init__(*args, **kwargs)
@@ -72,8 +73,9 @@ class ChangePasswordForm(PasswordChangeForm):
 			self.fields['new_password2'].widget.attrs['placeholder'] = 'Confirm Password'
 			self.fields['new_password2'].label = ''
 			self.fields['new_password2'].help_text = '<span class="form-text text-muted"><small>Enter the same password as before, for verification.</small></span>'
+		
 		def clean_new_password1(self):
 			new_password = self.cleaned_data['new_password1']
-			if len(new_password) < 8:
-				raise ValidationError('The Password Must be Greater Than 8 characters ')
+			if len(new_password) > 15:
+				raise ValidationError('the password must be less than 15 characters ')
 			return new_password

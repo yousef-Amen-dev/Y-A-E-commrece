@@ -11,7 +11,7 @@ from cart.cart import Cart
 import json
 from django.db import transaction
 
-#  sign up function to sign up new user
+
 def signup_user(request):
   try:
     form = SignUpForm()
@@ -43,7 +43,6 @@ def signup_user(request):
     return redirect('signup')
 
 
-# login user function 
 def login_user(request):
   try:
     if request.method == "POST":
@@ -51,10 +50,8 @@ def login_user(request):
       user = authenticate(request,username =date['username'],password=date['password'])
       if user is not None:
         login(request,user)
-        
         current_user = Profile.objects.get(user__id = request.user.id ) 
         saved_cart = current_user.cart
-
         if saved_cart:
           # convert database string to python dictionary using JSON
           convert_cart = json.loads(saved_cart)
@@ -72,14 +69,12 @@ def login_user(request):
     return redirect('/')
 
 
-# logout user function
 def logout_user(request):
   logout(request)
   messages.success(request,'Logout successful.')
   return redirect('/')
 
 
-# user profile page
 @login_required
 def profile(request):
   try:
@@ -96,7 +91,7 @@ def profile(request):
     messages.error(request,error)
 
 
-# update user profile page
+
 @login_required
 def update_profile(request):
   try:
@@ -118,7 +113,6 @@ def update_profile(request):
     return redirect('/')
 
 
-# update password
 @login_required
 def update_password(request):
   try:
@@ -137,3 +131,5 @@ def update_password(request):
   except Exception as error:
     messages.error(request, f"An error occurred: {error}")
     return redirect('/')
+
+

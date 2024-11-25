@@ -12,7 +12,6 @@ from django.http import JsonResponse
 from django.db import transaction
 
 
-# home page showing the products 
 def home(request):
   context = {
     'products':Product.objects.all(),
@@ -21,11 +20,11 @@ def home(request):
   
   return render(request,'store/index.html',context)
 
-# about the website inforamtions
+
 def about(request):
   return render(request,'store/about.html')
 
-# product details to show every product in sangle page
+
 def product_details(request,slug):
   product = Product.objects.get(slug =slug)
   related_products = Product.objects.filter(category=product.category).exclude(slug=product.slug)
@@ -36,11 +35,8 @@ def product_details(request,slug):
   return render(request,'store/product_details.html',context)
 
 
-# the all categories and the all related products
 def all_categories(requset):
-  # get the all categories
   categories = Category.objects.all()
-  # get the all products
   products = Product.objects.all()
   context  = {
     'categories': categories,
@@ -48,7 +44,7 @@ def all_categories(requset):
     }
   return render(requset,'store/all_categories.html',context)
 
-# category and all products in singal page 
+
 def category(request,cat):
   try:
     products = Product.objects.filter(category__name=cat)
@@ -58,7 +54,6 @@ def category(request,cat):
     return redirect('/')
 
 
-# offers function 
 def discount_products(request):
   products = Product.objects.filter(discount__gt=0)
   context = {'products':products}
@@ -71,7 +66,6 @@ def add_products(request):
     # add the product info in the add_products form
     product_form = Add_Products_Form(request.POST,request.FILES)
     if product_form.is_valid():
-
       # save the products
       product_form.save()
       messages.success(request,'Product Add Successfully')
@@ -79,9 +73,7 @@ def add_products(request):
     else:
       messages.info(request,'Product Is Not Add Please Chack The Product Informations And Try Agine..')
   product_form = Add_Products_Form()
-
   context = {'forms':product_form}
-
   return render(request,'store/add_products.html',context)
 
 
@@ -141,7 +133,6 @@ def add_categories(request):
   return render(request,'store/add_categories.html',context)
 
 
-# add products function to can added products from the website
 def contact_us(request):
   user = request.user
   if request.method == 'POST' :
@@ -247,9 +238,11 @@ def most_sold_products(request, num_products=10):
     .order_by('-total_quantity')[:num_products]
   # extract the products ids from product_ids_with_quantity and add him flat list,flat=True  makes sure result is list not list of tuples.
   product_ids = product_ids_with_quantity.values_list('products_id', flat=True)
-  # filters the products where the id is in list of product_ids and 
-  # return sums the total of product quantity using the related_name of the model (orderitem_quantity) 
-  # and order him again the most sold product is well be the first
+  """
+  filters the products where the id is in list of product_ids and 
+  return sums the total of product quantity using the related_name of the model (orderitem_quantity) 
+  and order him again the most sold product is well be the first"""
+
   products = Product.objects.filter(id__in=product_ids) \
     .annotate(total_quantity=Sum('orderitem__quantity')) \
     .order_by('-total_quantity')
